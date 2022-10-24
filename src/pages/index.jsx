@@ -255,7 +255,7 @@ export default function Home({ articles }) {
         </title>
         <meta
           name="description"
-          content="I’m Irsyad, a software designer and entrepreneur based in New York City. I’m the founder and CEO of Planetaria, where we develop technologies that empower regular people to explore space on their own terms."
+          content="I’m Irsyad, a software designer and entrepreneur based in Singapore. I’m the founder and CEO of Planetaria, where we develop technologies that empower regular people to explore space on their own terms."
         />
       </Head>
       <Container className="mt-9">
@@ -264,8 +264,7 @@ export default function Home({ articles }) {
             Software designer, founder, and amateur astronaut.
           </h1>
           <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
-            I’m Irsyad, a software designer and entrepreneur based in New York
-            City. I’m the founder and CEO of Planetaria, where we develop
+            I’m Irsyad, a software designer and entrepreneur based in Singapore. I’m the founder and CEO of Planetaria, where we develop
             technologies that empower regular people to explore space on their
             own terms.
           </p>
@@ -293,7 +292,7 @@ export default function Home({ articles }) {
           </div>
         </div>
       </Container>
-      <Photos />
+      {/*<Photos />*/}
       <Container className="mt-24 md:mt-28">
         <div className="mx-auto grid max-w-xl grid-cols-1 gap-y-20 lg:max-w-none lg:grid-cols-2">
           <div className="flex flex-col gap-16">
