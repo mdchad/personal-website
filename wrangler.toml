@@ -1,8 +1,10 @@
-name = "portfolio"
-compatibility_date = "2025-03-25"
-compatibility_flags = ["nodejs_compat"]
+name = "portoflio"
+compatibility_date = "2025-06-12"
+routes = [
+    { pattern = "irsyad.dev/*", zone_name = "irsyad.dev" },
+    { pattern = "www.irsyad.dev/*", zone_name = "irsyad.dev" }
+]
 
 [assets]
-directory = "./dist"
+directory = "./dist/"
 not_found_handling = "404-page"
-html_handling = "auto-trailing-slash"
