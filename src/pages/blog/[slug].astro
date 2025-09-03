@@ -1,0 +1,60 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { getCollection } from 'astro:content'
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog')
+  return posts.map(post => ({
+    params: { slug: post.slug },
+    props: { post }
+  }))
+}
+
+const { post } = Astro.props
+const { Content } = await post.render()
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+  <div class="section-spacing">
+    <article>
+      <header style="margin-bottom: 3rem;">
+        <h1>{post.data.title}</h1>
+        <time>
+          {post.data.date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}
+        </time>
+      </header>
+      
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+    
+    <nav style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #f0f0f0;">
+      <a href="/blog" class="hover:text-hotpink">← Back to journal</a>
+    </nav>
+  </div>
+</Layout>
+
+<style>
+  .prose {
+    max-width: none;
+  }
+  
+  .prose > * + * {
+    margin-top: 1.5rem;
+  }
+  
+  .prose h2 {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .prose h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+</style>

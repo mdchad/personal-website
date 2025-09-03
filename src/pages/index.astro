@@ -1,0 +1,56 @@
+---
+import Layout from '../layouts/Layout.astro'
+import { getCollection } from 'astro:content'
+
+const recentPosts = (await getCollection('blog'))
+  .filter(post => post.data.published)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3)
+---
+
+<Layout title="Portfolio" description="A minimal portfolio">
+  <div class="mb-6">
+    <h1 class="font-semibold text-xl mb-4"># intro</h1>
+    <p class="text-fg-secondary/80 ">Muhammad Irsyad</p>
+    <p class="text-fg-secondary/80 mb-2">Software Engineer</p>
+    <p class="text-fg-secondary/80">Building at Pixelmind Studio</p>
+
+    <!--{recentPosts.length > 0 && (-->
+    <!--  <div>-->
+    <!--    <h2>Recent</h2>-->
+    <!--    <ul style="list-style: none; padding: 0;">-->
+    <!--      {recentPosts.map(post => (-->
+    <!--        <li style="margin: 1rem 0;">-->
+    <!--          <a href={`/blog/${post.slug}`} style="display: block;">-->
+    <!--            <div>-->
+    <!--              <h3 style="">-->
+    <!--                {post.data.title}-->
+    <!--              </h3>-->
+    <!--              {post.data.description && (-->
+    <!--                <p style="">-->
+    <!--                  {post.data.description}-->
+    <!--                </p>-->
+    <!--              )}-->
+    <!--            </div>-->
+    <!--          </a>-->
+    <!--        </li>-->
+    <!--      ))}-->
+    <!--    </ul>-->
+    <!--  </div>-->
+    <!--)}-->
+    <h1 class="font-semibold text-xl mb-4 mt-12">## links</h1>
+    <nav>
+        <ul>
+            <!--<li>-->
+            <!--  <a href="/">Home</a>-->
+            <!--</li>-->
+            <li class="hover:text-hotpink">
+                <a href="/blog">blog</a>
+            </li>
+            <li class="hover:text-hotpink">
+                <a href="/projects">projects</a>
+            </li>
+        </ul>
+    </nav>
+  </div>
+</Layout>

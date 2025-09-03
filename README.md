@@ -1,42 +1,43 @@
-# Spotlight
+# Astro Starter Kit: Minimal
 
-Spotlight is a [Tailwind UI](https://tailwindui.com) site template built using [Tailwind CSS](https://tailwindcss.com) and [Next.js](https://nextjs.org).
-
-## Getting started
-
-To get started with this template, first install the npm dependencies:
-
-```bash
-npm install
+```sh
+npm create astro@latest -- --template minimal
 ```
 
-Next, create a `.env.local` file in the root of your project and set the `NEXT_PUBLIC_SITE_URL` variable to your site's public URL:
+> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
 
+## 🚀 Project Structure
+
+Inside of your Astro project, you'll see the following folders and files:
+
+```text
+/
+├── public/
+├── src/
+│   └── pages/
+│       └── index.astro
+└── package.json
 ```
-NEXT_PUBLIC_SITE_URL=https://example.com
-```
 
-Next, run the development server:
+Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
 
-```bash
-npm run dev
-```
+There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
 
-Finally, open [http://localhost:3000](http://localhost:3000) in your browser to view the website.
+Any static assets, like images, can be placed in the `public/` directory.
 
-## Customizing
+## 🧞 Commands
 
-You can start editing this template by modifying the files in the `/src` folder. The site will auto-update as you edit these files.
+All commands are run from the root of the project, from a terminal:
 
-## License
+| Command                   | Action                                           |
+| :------------------------ | :----------------------------------------------- |
+| `npm install`             | Installs dependencies                            |
+| `npm run dev`             | Starts local dev server at `localhost:4321`      |
+| `npm run build`           | Build your production site to `./dist/`          |
+| `npm run preview`         | Preview your build locally, before deploying     |
+| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
+| `npm run astro -- --help` | Get help using the Astro CLI                     |
 
-This site template is a commercial product and is licensed under the [Tailwind UI license](https://tailwindui.com/license).
+## 👀 Want to learn more?
 
-## Learn more
-
-To learn more about the technologies used in this site template, see the following resources:
-
-- [Tailwind CSS](https://tailwindcss.com/docs) - the official Tailwind CSS documentation
-- [Next.js](https://nextjs.org/docs) - the official Next.js documentation
-- [Headless UI](https://headlessui.dev) - the official Headless UI documentation
-- [MDX](https://mdxjs.com) - the MDX documentation
+Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
