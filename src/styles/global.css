@@ -40,6 +40,7 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   --color-fg-secondary: var(--fg-secondary);
+  --color-fg-dark-secondary: #999;
   --color-hotpink: #FF0099;
 }
 
@@ -77,6 +78,7 @@
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.705 0.015 286.067);
   --font-geist-mono: "Geist Mono Variable", monospace;
+  --fg-secondary: rgb(40, 36, 35);
   --fg-secondary: rgb(40, 36, 35);
 }
 

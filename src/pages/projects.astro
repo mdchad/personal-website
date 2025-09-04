@@ -28,7 +28,7 @@ const projects = [
     <a href="/" class="hover:text-hotpink">← Back to home</a>
     <h1 class="font-semibold text-xl mt-6">### Projects</h1>
     
-    <div class="my-4">
+    <div class="mt-4 mb-12">
       <p>
         A selection of tools and experiments I've worked on.
       </p>
@@ -40,13 +40,13 @@ const projects = [
           <li style="margin: 2rem 0; padding-bottom: 2rem; border-bottom: 1px solid #f0f0f0;">
             <div>
               <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
-                <h3 style="margin: 0; font-weight: 400;">{project.title}</h3>
+                <h3 class="text-lg">{project.title}</h3>
                 <span style="font-size: 0.875rem; ">{project.year}</span>
               </div>
-              <p style="margin: 0 0 0.5rem 0;">{project.description}</p>
-              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
-                {project.status}
-              </span>
+              <p class="text-fg-secondary/80 dark:text-fg-dark-secondary">{project.description}</p>
+              <!--<span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">-->
+              <!--  {project.status}-->
+              <!--</span>-->
             </div>
           </li>
         ))}

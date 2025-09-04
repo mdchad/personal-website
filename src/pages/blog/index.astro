@@ -18,10 +18,10 @@ const posts = (await getCollection('blog'))
           {posts.map(post => (
             <li style="margin: 2rem 0; padding-bottom: 2rem; border-bottom: 1px solid #f0f0f0;">
               <article>
-                <h2 class="font-semibold text-sm">
+                <h2 class="font-semibold text-base">
                   <a href={`/blog/${post.slug}`}>{post.data.title}</a>
                 </h2>
-                <time class="text-fg-secondary/80">
+                <time class="text-fg-secondary/80  dark:text-fg-dark-secondary">
                   {post.data.date.toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'long', 
@@ -29,7 +29,7 @@ const posts = (await getCollection('blog'))
                   })}
                 </time>
                 {post.data.description && (
-                  <p style="margin: 1rem 0 0 0;">
+                  <p class="mt-8 text-sm">
                     {post.data.description}
                   </p>
                 )}
