@@ -7,7 +7,7 @@ const posts = (await getCollection('blog'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
 ---
 
-<Layout title="Journal" description="Thoughts and observations">
+<Layout title="Blog" description="Thoughts and observations">
   <div>
     <a href="/" class="hover:text-hotpink">← Back to home</a>
     <h1 class="font-semibold text-xl mt-6">###  blog</h1>
