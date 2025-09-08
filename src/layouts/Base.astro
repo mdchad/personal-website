@@ -20,9 +20,7 @@ const { title= 'Izz Irsyad', description = 'Mostly tinkering' } = Astro.props
     <meta name="description" content={description} />
     <title>{title}</title>
   </head>
-  <body class="min-h-dvh flex items-center justify-center p-6 font-mono text-sm font-normal dark:bg-black dark:text-white">
-    <div class="max-w-[500px] w-full mb-20">
-      <slot />
-    </div>
+  <body class="min-h-dvh flex flex-col p-6 font-mono text-sm font-normal dark:bg-black dark:text-white">
+    <slot />
   </body>
 </html>
