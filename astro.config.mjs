@@ -12,6 +12,7 @@ export default defineConfig({
   integrations: [react(), sitemap()],
   output: 'static',
   site: "https://irsyad.dev",
+  trailingSlash: 'never',
   build: {
     assets: '_assets'
   },
