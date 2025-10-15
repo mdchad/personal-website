@@ -6,7 +6,9 @@ interface Props {
 
 const { title= 'Izz Irsyad', description = 'Mostly tinkering' } = Astro.props
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+// Remove trailing slash from pathname for canonical URL
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/'
+const canonicalURL = new URL(pathname, Astro.site)
 ---
 
 <html lang="en">

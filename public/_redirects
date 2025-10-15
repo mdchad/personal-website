@@ -1,0 +1,3 @@
+# Redirect all URLs with trailing slashes to without trailing slashes
+# This ensures Google only indexes the canonical version
+/*/  /:splat  301!
