@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro'
+import Footer from '../components/Footer.astro'
+import WeddingAttire from '../components/WeddingAttire.tsx'
+import '@fontsource-variable/geist-mono'
+import '../styles/global.css'
+---
+
+<Base title="Wedding Attire" description="Customise our Malay wedding attire colour combination">
+  <div class="flex-1 flex justify-center">
+    <div class="w-full max-w-2xl">
+      <a href="/" class="hover:text-hotpink">← Back to home</a>
+      <h1 class="font-semibold text-xl mt-6">Wedding attire</h1>
+      <h1 class="font-semibold text-xl mt-6">#irsyadQilaHani</h1>
+
+      <div class="mt-4 mb-8">
+        <p class="text-fg-secondary/80 dark:text-fg-dark-secondary">
+          Baju melayu &amp; baju kurung. Play with the colour combination — pick a
+          palette or tweak each piece.
+        </p>
+      </div>
+
+      <WeddingAttire client:load />
+    </div>
+  </div>
+  <Footer />
+</Base>
