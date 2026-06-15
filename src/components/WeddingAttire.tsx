@@ -7,7 +7,8 @@ type Colors = {
   groomBaju: string // groom's top (baju melayu)
   sampin: string // groom's waist wrap (samping)
   seluar: string // groom's trousers
-  tudung: string // bride's hijab + veil
+  tudung: string // bride's hijab (head + front drape)
+  veil: string // bride's flowing veil
   brideBaju: string // bride's top (baju kurung)
   kain: string // bride's skirt
 }
@@ -19,6 +20,7 @@ const DEFAULT: Colors = {
   sampin: '#eadac2',
   seluar: '#f3e4d0',
   tudung: '#f6ecdf',
+  veil: '#f6ecdf',
   brideBaju: '#f3e5d0',
   kain: '#f3e4d0',
 }
@@ -35,6 +37,7 @@ const PRESETS: Preset[] = [
       sampin: '#9bab86',
       seluar: '#eef0e6',
       tudung: '#dfe6d3',
+      veil: '#dfe6d3',
       brideBaju: '#eef1e8',
       kain: '#a7b693',
     },
@@ -47,6 +50,7 @@ const PRESETS: Preset[] = [
       sampin: '#c98f96',
       seluar: '#f3e9e7',
       tudung: '#e9d4d3',
+      veil: '#e9d4d3',
       brideBaju: '#f4ebe9',
       kain: '#cf9aa1',
     },
@@ -59,6 +63,7 @@ const PRESETS: Preset[] = [
       sampin: '#c9ad6b',
       seluar: '#1f2747',
       tudung: '#e9dcc0',
+      veil: '#e9dcc0',
       brideBaju: '#26305a',
       kain: '#c9ad6b',
     },
@@ -71,6 +76,7 @@ const PRESETS: Preset[] = [
       sampin: '#c07a52',
       seluar: '#f0e2d4',
       tudung: '#ecdbc8',
+      veil: '#ecdbc8',
       brideBaju: '#f1e5d8',
       kain: '#c6845c',
     },
@@ -83,6 +89,7 @@ const PRESETS: Preset[] = [
       sampin: '#caa861',
       seluar: '#0f3a2f',
       tudung: '#e9dcc0',
+      veil: '#e9dcc0',
       brideBaju: '#134438',
       kain: '#caa861',
     },
@@ -94,7 +101,8 @@ const SWATCHES: { key: keyof Colors; label: string; group: 'groom' | 'bride' }[]
   { key: 'groomBaju', label: 'baju melayu', group: 'groom' },
   { key: 'sampin', label: 'sampin', group: 'groom' },
   { key: 'seluar', label: 'seluar', group: 'groom' },
-  { key: 'tudung', label: 'tudung & veil', group: 'bride' },
+  { key: 'tudung', label: 'tudung', group: 'bride' },
+  { key: 'veil', label: 'veil', group: 'bride' },
   { key: 'brideBaju', label: 'baju kurung', group: 'bride' },
   { key: 'kain', label: 'kain', group: 'bride' },
 ]
@@ -112,6 +120,16 @@ function shade(hex: string, amt: number): string {
 
 // page-background colour of the artwork; also shows through the hijab's face opening
 const BG = '#fdf9f6'
+
+// The traced scarf is one continuous fabric, so the hijab and veil share paths.
+// We clip the shared paths along the drawn fold line (SEAM, in viewBox space):
+// everything to its right is the flowing veil, everything left is the hijab.
+const SEAM =
+  'M1003,58 L1010,110 L1016,170 L1021,230 L1023,270 L1005,310 L985,380 L960,460 L975,600 L940,690'
+const VEIL_BOUNDARY = `${SEAM} L1145,690 L1145,58 Z`
+// the veil is then lifted out and shifted into its own spot — right of the
+// hijab, above the skirt — so it reads as a separate piece, not a recolour.
+const VEIL_OFFSET = 'translate(130,-12)'
 
 export default function WeddingAttire() {
   const [colors, setColors] = useState<Colors>(DEFAULT)
@@ -132,6 +150,7 @@ export default function WeddingAttire() {
       sampin: rnd(),
       seluar: rnd(),
       tudung: rnd(),
+      veil: rnd(),
       brideBaju: rnd(),
       kain: rnd(),
     })
@@ -166,15 +185,39 @@ export default function WeddingAttire() {
           className="w-full h-auto"
           style={{ display: 'block' }}
         >
+          <defs>
+            {/* veil = right of the fold; hijab = the rest (even-odd cut-out) */}
+            <clipPath id="attire-veil">
+              <path d={VEIL_BOUNDARY} />
+            </clipPath>
+            <clipPath id="attire-hijab" clipRule="evenodd">
+              <path d={`M70,30 H1282 V1096 H70 Z ${VEIL_BOUNDARY}`} />
+            </clipPath>
+          </defs>
+
           {/* background so the downloaded SVG matches the on-page panel */}
           <rect x="70" y="30" width="1212" height="1066" fill={BG} />
-          {ATTIRE_PATHS.map((p, i) => (
-            <path
-              key={i}
-              d={p.d}
-              fill={p.piece === 'fixed' ? BG : shade(c[p.piece], p.shade)}
-            />
-          ))}
+          {/* hijab + every other piece, drawn in place. tudung paths are
+              clipped to the hijab side of the seam (the veil side is omitted) */}
+          {ATTIRE_PATHS.map((p, i) =>
+            p.piece === 'tudung' ? (
+              <path key={i} d={p.d} clipPath="url(#attire-hijab)" fill={shade(c.tudung, p.shade)} />
+            ) : (
+              <path
+                key={i}
+                d={p.d}
+                fill={p.piece === 'fixed' ? BG : shade(c[p.piece], p.shade)}
+              />
+            )
+          )}
+
+          {/* the veil: the same paths clipped to the veil side, then shifted
+              out to its own spot so it stands alone as a separate piece */}
+          <g transform={VEIL_OFFSET}>
+            {ATTIRE_PATHS.filter((p) => p.piece === 'tudung').map((p, i) => (
+              <path key={i} d={p.d} clipPath="url(#attire-veil)" fill={shade(c.veil, p.shade)} />
+            ))}
+          </g>
         </svg>
       </div>
 
