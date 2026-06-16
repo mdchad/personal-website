@@ -1,5 +1,7 @@
 name = "portoflio"
+main = "./worker/index.ts"
 compatibility_date = "2025-06-12"
+compatibility_flags = ["nodejs_compat"]
 routes = [
     { pattern = "irsyad.dev/*", zone_name = "irsyad.dev" },
     { pattern = "www.irsyad.dev/*", zone_name = "irsyad.dev" }
@@ -7,5 +9,10 @@ routes = [
 
 [assets]
 directory = "./dist/"
+binding = "ASSETS"
 html_handling = "drop-trailing-slash"
 not_found_handling = "404-page"
+
+[[kv_namespaces]]
+binding = "ATTIRE_KV"
+id = "1e55c51c3897457ab72a294b2125cb9f"

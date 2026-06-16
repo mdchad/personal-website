@@ -1,5 +1,12 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ATTIRE_PATHS, VIEW_BOX } from './attire-paths'
+
+type SavedAttire = {
+  id: string
+  name: string
+  colors: Colors
+  createdAt: number
+}
 
 // ── Colour model ───────────────────────────────────────────────
 type Colors = {
@@ -135,6 +142,62 @@ export default function WeddingAttire() {
   const [colors, setColors] = useState<Colors>(DEFAULT)
   const svgRef = useRef<SVGSVGElement>(null)
 
+  // shared collection (Cloudflare KV via /api/attires)
+  const [saved, setSaved] = useState<SavedAttire[]>([])
+  const [name, setName] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  const loadSaved = async () => {
+    try {
+      const res = await fetch('/api/attires')
+      if (!res.ok) throw new Error()
+      setSaved(await res.json())
+    } catch {
+      setError('could not load saved palettes')
+    }
+  }
+
+  useEffect(() => {
+    loadSaved()
+  }, [])
+
+  const saveAttire = async () => {
+    const who = name.trim()
+    if (!who) {
+      setError('add your name first')
+      return
+    }
+    setBusy(true)
+    setError('')
+    try {
+      const res = await fetch('/api/attires', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name: who, colors }),
+      })
+      if (!res.ok) throw new Error()
+      const entry: SavedAttire = await res.json()
+      setSaved((s) => [entry, ...s])
+    } catch {
+      setError('could not save — try again')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const deleteAttire = async (id: string) => {
+    const prev = saved
+    setSaved((s) => s.filter((a) => a.id !== id)) // optimistic
+    try {
+      const res = await fetch(`/api/attires?id=${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error()
+    } catch {
+      setSaved(prev) // rollback
+      setError('could not delete — try again')
+    }
+  }
+
   const set = (key: keyof Colors, value: string) =>
     setColors((c) => ({ ...c, [key]: value }))
 
@@ -224,7 +287,7 @@ export default function WeddingAttire() {
       {/* presets */}
       <div className="mt-6">
         <p className="mb-2 text-fg-secondary/70 dark:text-fg-dark-secondary">// palettes</p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 py-2">
           {PRESETS.map((p) => (
             <button
               key={p.name}
@@ -254,31 +317,34 @@ export default function WeddingAttire() {
             <p className="mb-2 text-fg-secondary/70 dark:text-fg-dark-secondary">
               // {group === 'groom' ? 'pengantin lelaki' : 'pengantin perempuan'}
             </p>
-            {SWATCHES.filter((s) => s.group === group).map((s) => (
-              <label
-                key={s.key}
-                className="flex cursor-pointer items-center justify-between border-b py-2"
-                style={{ borderColor: '#00000010' }}
-              >
-                <span>{s.label}</span>
-                <span className="flex items-center gap-2">
-                  <span className="text-xs text-fg-secondary/50 dark:text-fg-dark-secondary uppercase">
-                    {colors[s.key]}
+            <div className="mb-8">
+              {SWATCHES.filter((s) => s.group === group).map((s) => (
+                <label
+                  key={s.key}
+                  className="flex cursor-pointer items-center justify-between border-b py-2"
+                  style={{ borderColor: '#00000010' }}
+                >
+                  <span>{s.label}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-xs text-fg-secondary/50 dark:text-fg-dark-secondary uppercase">
+                      {colors[s.key]}
+                    </span>
+                    <span
+                      className="relative inline-block h-7 w-9 rounded-md border"
+                      style={{ background: colors[s.key], borderColor: '#00000020' }}
+                    >
+                      <input
+                        type="color"
+                        value={colors[s.key]}
+                        onChange={(e) => set(s.key, e.target.value)}
+                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                      />
+                    </span>
                   </span>
-                  <span
-                    className="relative inline-block h-7 w-9 rounded-md border"
-                    style={{ background: colors[s.key], borderColor: '#00000020' }}
-                  >
-                    <input
-                      type="color"
-                      value={colors[s.key]}
-                      onChange={(e) => set(s.key, e.target.value)}
-                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                    />
-                  </span>
-                </span>
-              </label>
-            ))}
+                </label>
+              ))}
+
+            </div>
           </div>
         ))}
       </div>
@@ -299,14 +365,89 @@ export default function WeddingAttire() {
         >
           reset
         </button>
-        <button
-          onClick={download}
-          className="rounded-md border px-3 py-1.5 transition-colors hover:border-hotpink hover:text-hotpink"
-          style={{ borderColor: '#e4dccb' }}
-        >
-          download svg
-        </button>
+        {/*<button*/}
+        {/*  onClick={download}*/}
+        {/*  className="rounded-md border px-3 py-1.5 transition-colors hover:border-hotpink hover:text-hotpink"*/}
+        {/*  style={{ borderColor: '#e4dccb' }}*/}
+        {/*>*/}
+        {/*  download svg*/}
+        {/*</button>*/}
       </div>
+
+      {/* save to shared collection */}
+      <div className="mt-8">
+        <p className="mb-2 text-fg-secondary/70 dark:text-fg-dark-secondary">// save to our collection</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && saveAttire()}
+            placeholder="your name"
+            maxLength={40}
+            className="rounded-md border bg-transparent px-3 py-1.5 outline-none focus:border-hotpink"
+            style={{ borderColor: '#e4dccb' }}
+          />
+          <button
+            onClick={saveAttire}
+            disabled={busy}
+            className="rounded-md border px-3 py-1.5 transition-colors hover:border-hotpink hover:text-hotpink disabled:opacity-50"
+            style={{ borderColor: '#e4dccb' }}
+          >
+            {busy ? 'saving…' : 'save palette'}
+          </button>
+          {error && <span className="text-xs text-hotpink">{error}</span>}
+        </div>
+      </div>
+
+      {/* the shared collection */}
+      {saved.length > 0 && (
+        <div className="mt-6">
+          <p className="mb-2 text-fg-secondary/70 dark:text-fg-dark-secondary">
+            // saved palettes ({saved.length})
+          </p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {saved.map((a) => (
+              <div
+                key={a.id}
+                className="flex items-center justify-between gap-2 rounded-md border px-2.5 py-2"
+                style={{ borderColor: '#e4dccb' }}
+              >
+                <button
+                  onClick={() => setColors({ ...DEFAULT, ...a.colors })}
+                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                  title="load this palette"
+                >
+                  <span className="flex shrink-0">
+                    {[a.colors.sampin, a.colors.kain, a.colors.tudung, a.colors.songkok].map(
+                      (col, i) => (
+                        <span
+                          key={i}
+                          className="h-3.5 w-3.5 rounded-full"
+                          style={{ background: col, marginLeft: i ? -5 : 0, border: '1px solid #00000018' }}
+                        />
+                      )
+                    )}
+                  </span>
+                  <span className="min-w-0 truncate text-xs">
+                    {a.name}{' '}
+                    <span className="text-fg-secondary/50 dark:text-fg-dark-secondary">
+                      · {new Date(a.createdAt).toLocaleDateString()}
+                    </span>
+                  </span>
+                </button>
+                <button
+                  onClick={() => deleteAttire(a.id)}
+                  className="shrink-0 text-xs text-fg-secondary/50 transition-colors hover:text-hotpink dark:text-fg-dark-secondary"
+                  title="delete"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
