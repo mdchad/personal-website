@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro'
 import Footer from '../components/Footer.astro'
 import WeddingAttire from '../components/WeddingAttire.tsx'
+import Countdown from '../components/Countdown.tsx'
 import '@fontsource-variable/geist-mono'
 import '../styles/global.css'
 ---
@@ -11,7 +12,10 @@ import '../styles/global.css'
     <div class="w-full max-w-2xl">
       <a href="/" class="hover:text-hotpink">← Back to home</a>
       <h1 class="font-semibold text-xl mt-6">Wedding attire</h1>
-      <h1 class="font-semibold text-xl mt-6">#irsyadQilaHani</h1>
+      <div class="mt-6 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <h1 class="font-semibold text-3xl">#irsyadQilaHani</h1>
+        <Countdown client:load />
+      </div>
 
       <div class="mt-4 mb-8">
         <p class="text-fg-secondary/80 dark:text-fg-dark-secondary">
