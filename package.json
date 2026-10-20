@@ -4,11 +4,13 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && bun run build:slides",
     "preview": "astro preview",
     "deploy": "bun run build && wrangler deploy",
     "wrangler": "wrangler",
-    "astro": "astro"
+    "astro": "astro",
+    "build:slides": "cd slides && bun install && bun run build --out-dir ../dist/slides",
+    "dev:slides": "cd slides && bun run dev"
   },
   "dependencies": {
     "@astrojs/react": "^4.3.0",

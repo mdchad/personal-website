@@ -91,6 +91,14 @@ export default {
       return json({ error: 'method not allowed' }, 405)
     }
 
+    // open-slide is a client-routed SPA under /slides — unknown paths
+    // there (e.g. /slides/my-deck) fall back to its index page
+    if (url.pathname === '/slides' || url.pathname.startsWith('/slides/')) {
+      const res = await env.ASSETS.fetch(request)
+      if (res.status !== 404 || url.pathname.startsWith('/slides/assets/')) return res
+      return env.ASSETS.fetch(new Request(new URL('/slides', url), request))
+    }
+
     // anything else → static site
     return env.ASSETS.fetch(request)
   },
