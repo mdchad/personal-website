@@ -1,0 +1,74 @@
+---
+import Base from '../../layouts/Base.astro'
+import Footer from '../../components/Footer.astro'
+import '@fontsource-variable/geist-mono'
+import '../../styles/global.css'
+---
+
+<Base title="Seating · Irsyad & 'Aqilah" description="The hall at The Iris: 27 tables, 274 seats">
+  <div class="flex-1 flex justify-center mb-20">
+    <div class="w-full max-w-2xl">
+      <a href="/wedding" class="hover:text-hotpink">← Back to invitation</a>
+      <h1 class="font-semibold text-xl mt-6">Seating</h1>
+      <p class="mt-4 text-fg-secondary/80 dark:text-fg-dark-secondary">
+        The hall at The Iris, seen from the entrance. Point at a table, or tap
+        it, to pull out its chairs.
+      </p>
+
+      <!-- always paper-coloured, like the card -->
+      <div class="seating-plate relative mt-8 overflow-hidden rounded-sm shadow-[0_10px_40px_-12px_rgb(0_0_0/0.25)]">
+        <span id="seating-read" class="absolute top-3 right-4 z-10 text-xs tabular-nums pointer-events-none" aria-live="polite"></span>
+        <div id="seating-stage"></div>
+      </div>
+
+      <p class="mt-4 text-xs text-fg-secondary/60 dark:text-fg-dark-secondary">
+        27 tables · 274 seats · not drawn to scale
+      </p>
+    </div>
+  </div>
+  <Footer />
+
+  <!-- the hairline engine, then a host that mounts the figure, then the figure itself -->
+  <script is:inline src="/wedding/seating/kernel.js"></script>
+  <script is:inline>
+    window.hairline = (figure) => {
+      const stage = document.getElementById('seating-stage')
+      const out = document.getElementById('seating-read')
+      HL.inject(document)
+      stage.setAttribute('data-hairline', figure.name)
+      stage.setAttribute('role', 'img')
+      stage.setAttribute('aria-label', figure.means)
+      const svg = HL.mk('svg', { viewBox: '0 0 400 320', 'aria-hidden': 'true' }, stage)
+      let text = null
+      const read = {
+        get textContent() { return text },
+        set textContent(value) { text = value == null ? '' : String(value); out.textContent = text },
+      }
+      figure.mount({ stage, svg, read }, figure.range[1])
+      // walk the tour until a hand arrives, so a phone shows what the plan does
+      HL.tour(stage, figure.tour || HL.LAP)
+    }
+  </script>
+  <script is:inline type="module" src="/wedding/seating/seating.js"></script>
+</Base>
+
+<style>
+  .seating-plate {
+    background: #f8f5ec;
+    color: #6b7354;
+    --hairline-plate: #f8f5ec;
+    --hairline-hi: #b84f6c;
+    --hairline-edge: #7d8866;
+    --hairline-mid: #b3b89b;
+    --hairline-lo: #dcd6bb;
+    --hairline-stroke: 1.2;
+    /* the figure draws in a 5:4 box with the hall across its middle: crop to the hall */
+    aspect-ratio: 400 / 215;
+  }
+  #seating-stage {
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    translate: 0 -51%;
+  }
+</style>
