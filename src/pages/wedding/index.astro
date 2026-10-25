@@ -4,9 +4,25 @@ import Footer from '../../components/Footer.astro'
 import Countdown from '../../components/Countdown.tsx'
 import '@fontsource-variable/geist-mono'
 import '../../styles/global.css'
+
+const title = "Walimatul Urus · Irsyad & 'Aqilah"
+const description = "Irsyad & 'Aqilah — 30 May 2027 · #QilsLoveAtFirstSyad"
+const ogImage = new URL('/wedding/og.jpg', Astro.site)
 ---
 
-<Base title="Walimatul Urus · Irsyad & 'Aqilah" description="Irsyad & 'Aqilah — 30 May 2027 · #QilsLoveAtFirstSyad">
+<Base title={title} description={description}>
+  <Fragment slot="head">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={new URL('/wedding', Astro.site)} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Walimatul Urus invitation card for Irsyad & 'Aqilah, 30 May 2027" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
+  </Fragment>
   <div class="flex-1 flex justify-center mb-20">
     <div class="w-full max-w-md">
       <a href="/" class="hover:text-hotpink">← Back to home</a>
