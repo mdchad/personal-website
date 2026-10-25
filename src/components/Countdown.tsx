@@ -3,7 +3,14 @@ import 'slot-text/style.css'
 import { SlotText } from 'slot-text/react'
 
 // wedding day
-const TARGET = new Date('2026-08-08T00:00:00').getTime()
+const bigDay = '2027-05-31T00:00:00'
+const date = new Date(bigDay)
+const TARGET = new Date(bigDay).getTime()
+const formattedDate = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+}).format(date);
 
 function remaining() {
   const diff = TARGET - Date.now()
@@ -48,7 +55,7 @@ export default function Countdown() {
         ))}
       </span>
       <span className="text-xs text-fg-secondary/50 dark:text-fg-dark-secondary">
-        8 August 2026
+        {formattedDate}
       </span>
     </span>
   )
