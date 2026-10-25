@@ -11,7 +11,7 @@ type SavedAttire = {
 // ── Colour model ───────────────────────────────────────────────
 type Colors = {
   songkok: string // groom's hat
-  groomBaju: string // groom's top (baju melayu)
+  groomBaju: string // groom's top
   sampin: string // groom's waist wrap (samping)
   seluar: string // groom's trousers
   tudung: string // bride's hijab (head + front drape)
@@ -105,7 +105,7 @@ const PRESETS: Preset[] = [
 
 const SWATCHES: { key: keyof Colors; label: string; group: 'groom' | 'bride' }[] = [
   { key: 'songkok', label: 'songkok', group: 'groom' },
-  { key: 'groomBaju', label: 'baju melayu', group: 'groom' },
+  { key: 'groomBaju', label: 'baju kurung', group: 'groom' },
   { key: 'sampin', label: 'sampin', group: 'groom' },
   { key: 'seluar', label: 'seluar', group: 'groom' },
   { key: 'tudung', label: 'tudung', group: 'bride' },

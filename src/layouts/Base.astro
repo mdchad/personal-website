@@ -24,6 +24,7 @@ const canonicalURL = new URL(pathname, Astro.site)
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <slot name="head" />
   </head>
   <body class="min-h-dvh flex flex-col p-6 font-mono text-sm font-normal dark:bg-black dark:text-white">
     <slot />

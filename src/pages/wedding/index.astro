@@ -1,0 +1,43 @@
+---
+import Base from '../../layouts/Base.astro'
+import Footer from '../../components/Footer.astro'
+import WeddingCard from '../../components/WeddingCard.tsx'
+import Countdown from '../../components/Countdown.tsx'
+import '@fontsource-variable/geist-mono'
+import '../../styles/global.css'
+---
+
+<Base title="Walimatul Urus · Irsyad & 'Aqilah" description="Irsyad & 'Aqilah — 30 May 2027 · #QilsLoveAtFirstSyad">
+  <Fragment slot="head">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Cormorant+Garamond:wght@600&family=Pinyon+Script&display=swap"
+    />
+  </Fragment>
+
+  <div class="flex-1 flex justify-center mb-20">
+    <div class="w-full max-w-md">
+      <a href="/" class="hover:text-hotpink">← Back to home</a>
+
+      <div class="mt-6 overflow-hidden rounded-sm shadow-[0_10px_40px_-12px_rgb(0_0_0/0.25)]">
+        <WeddingCard />
+      </div>
+
+      <div class="mt-8 flex justify-center">
+        <Countdown client:load />
+      </div>
+
+      <nav class="mt-10">
+        <!--<h2 class="font-semibold text-xl mb-4">## more</h2>-->
+        <ul>
+          <li class="hover:text-hotpink">
+            <a href="/wedding/attire">wedding attire →</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <Footer />
+</Base>

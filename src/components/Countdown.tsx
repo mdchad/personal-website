@@ -3,7 +3,7 @@ import 'slot-text/style.css'
 import { SlotText } from 'slot-text/react'
 
 // wedding day
-const bigDay = '2027-05-31T00:00:00'
+const bigDay = '2027-05-30T00:00:00'
 const date = new Date(bigDay)
 const TARGET = new Date(bigDay).getTime()
 const formattedDate = new Intl.DateTimeFormat('en-GB', {
