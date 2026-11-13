@@ -16,3 +16,11 @@ not_found_handling = "404-page"
 [[kv_namespaces]]
 binding = "ATTIRE_KV"
 id = "1e55c51c3897457ab72a294b2125cb9f"
+# Apple Wallet pass images are bundled into the worker as ArrayBuffers
+[[rules]]
+type = "Data"
+globs = ["**/*.png"]
+fallthrough = false
+
+# Pass signing secrets (set with `wrangler secret put`, or .dev.vars locally):
+# PASS_TYPE_ID, APPLE_TEAM_ID, PASS_CERT_PEM, PASS_KEY_PEM, WWDR_CERT_PEM

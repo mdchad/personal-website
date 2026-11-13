@@ -180,6 +180,26 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
         </ol>
       </section>
 
+      <div class="divider reveal" aria-hidden="true"><span></span>❦<span></span></div>
+
+      <section class="block reveal rsvp">
+        <h2>RSVP</h2>
+        <form id="rsvp-form">
+          <label class="sr-only" for="rsvp-name">Nama · Name</label>
+          <input id="rsvp-name" name="name" type="text" autocomplete="name" maxlength="60" placeholder="Nama · Name" required />
+          <button class="btn solid" type="submit">Hantar · Submit</button>
+          <p id="rsvp-error" class="sub small error" role="alert" hidden></p>
+        </form>
+        <div id="rsvp-done" hidden>
+          <p class="big">Terima kasih, <span id="rsvp-who"></span>!</p>
+          <p class="sub en">Thank you, see you there</p>
+          <a id="wallet-btn" class="wallet-btn" href="#">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="15" rx="3"/><path d="M2.5 10h19M16 14.5h2"/></svg>
+            Add to Apple Wallet
+          </a>
+        </div>
+      </section>
+
       <section class="block reveal verse">
         <p class="ayah" lang="ar" role="img" aria-label="وَمِنۡ ءَايَٰتِهِۦٓ أَنۡ خَلَقَ لَكُم مِّنۡ أَنفُسِكُمۡ أَزۡوَٰجٗا لِّتَسۡكُنُوٓاْ إِلَيۡهَا وَجَعَلَ بَيۡنَكُم مَّوَدَّةٗ وَرَحۡمَةًۚ إِنَّ فِي ذَٰلِكَ لَأٓيَٰتٖ لِّقَوۡمٖ يَتَفَكَّرُونَ">ﮉ ﮊ ﮋ ﮌ ﮍ ﮎ ﮏ ﮐ ﮑ ﮒ ﮓ ﮔ ﮕ ﮖﮗ ﮘ ﮙ ﮚ ﮛ ﮜ ﮝ ﮞ</p>
         <p class="sub en">
@@ -383,7 +403,7 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
   .guest { border-top: 1px dotted var(--sage-soft); border-bottom: 1px dotted var(--sage-soft); padding: 0.5rem 0; margin: 1rem 0; }
   .lead + .sub.en { margin-top: -0.6rem; }
   .bismillah { font-family: 'KFGQPC Symbols'; font-size: clamp(1.5rem, 8.4vw, 2.35rem); line-height: 1.6; color: var(--sage); white-space: nowrap; max-width: 100%; overflow: hidden; }
-  .ayah { font-family: 'QPC V1 P406'; font-size: clamp(1.45rem, 7vw, 1.9rem); line-height: 2.1; direction: rtl; margin-bottom: 0.75rem; word-spacing: 0.05em; }
+  .ayah { font-family: 'QPC V1 P406'; font-size: clamp(1.2rem, 5.6vw, 1.5rem); line-height: 2.1; direction: rtl; margin-bottom: 0.75rem; word-spacing: 0.05em; }
   .couple { font-family: var(--script); font-size: clamp(1.9rem, 8vw, 2.4rem); line-height: 1.3; }
   .amp { font-family: var(--script); font-size: 2rem; color: var(--rose); }
   .script { font-family: var(--script); font-size: 2.2rem; margin-top: 1.5rem; }
@@ -405,6 +425,28 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
   .btn:active { transform: scale(0.97); }
   .btn.sm { padding: 0.35rem 0.8rem; font-size: 0.85rem; }
 
+  .rsvp form { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+  .rsvp input {
+    width: 100%; max-width: 280px; padding: 0.6rem 0.9rem; text-align: center;
+    font: inherit; color: var(--sage); background: #fffdf8;
+    border: 1px solid var(--gold); border-radius: 999px; outline: none;
+  }
+  .rsvp input:focus-visible { border-color: var(--sage); }
+  .rsvp input::placeholder { color: var(--sage-soft); opacity: 0.7; }
+  .btn.solid { background: var(--sage); color: var(--paper); cursor: pointer; font: inherit; }
+  .btn.solid:hover { background: #4f5a40; }
+  .btn.solid:disabled { opacity: 0.6; cursor: progress; }
+  .error { color: #b5546a; }
+  #rsvp-done .big { margin-bottom: 0.1rem; }
+  .wallet-btn {
+    display: inline-flex; align-items: center; gap: 0.55rem; margin-top: 1.1rem;
+    padding: 0.7rem 1.25rem; border-radius: 10px; background: #000; color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; font-size: 0.95rem; font-weight: 500;
+    transition: transform 160ms ease;
+  }
+  .wallet-btn:active { transform: scale(0.97); }
+  .wallet-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
   .countdown div { border: 1px solid var(--gold); padding: 0.7rem 0 0.5rem; background: #fffdf8; }
   .countdown b { display: block; font-size: 1.7rem; font-weight: 500; font-variant-numeric: lining-nums tabular-nums; }
@@ -539,6 +581,49 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
   }
   tick()
   setInterval(tick, 1000)
+
+  // RSVP → Apple Wallet pass
+  const form = document.getElementById('rsvp-form') as HTMLFormElement
+  const done = document.getElementById('rsvp-done')!
+  const errorEl = document.getElementById('rsvp-error')!
+  const STORE = 'aqilah-rsvp'
+
+  function showDone(guest: { id: string; name: string }) {
+    form.hidden = true
+    done.hidden = false
+    document.getElementById('rsvp-who')!.textContent = guest.name
+    ;(document.getElementById('wallet-btn') as HTMLAnchorElement).href = `/api/aqilah/pass/${guest.id}.pkpass`
+  }
+
+  try {
+    const saved = localStorage.getItem(STORE)
+    if (saved) showDone(JSON.parse(saved))
+  } catch {}
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const button = form.querySelector('button')!
+    const name = (form.elements.namedItem('name') as HTMLInputElement).value.trim()
+    if (!name) return
+    button.disabled = true
+    errorEl.hidden = true
+    try {
+      const res = await fetch('/api/aqilah/rsvp', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const guest = await res.json()
+      try { localStorage.setItem(STORE, JSON.stringify(guest)) } catch {}
+      showDone(guest)
+    } catch {
+      errorEl.textContent = 'Maaf, cuba lagi · Sorry, please try again'
+      errorEl.hidden = false
+    } finally {
+      button.disabled = false
+    }
+  })
 
   // bottom sheets
   const backdrop = document.getElementById('sheet-backdrop')!

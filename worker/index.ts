@@ -1,12 +1,14 @@
 // Worker that adds a tiny JSON API on top of the static Astro site.
 // Everything except /api/* is served from the prebuilt ./dist assets.
 
+import { buildPass, type PassEnv } from './pass'
+
 interface KVNamespace {
   get(key: string): Promise<string | null>
   put(key: string, value: string): Promise<void>
 }
 
-interface Env {
+interface Env extends PassEnv {
   ATTIRE_KV: KVNamespace
   ASSETS: { fetch(request: Request): Promise<Response> }
 }
@@ -89,6 +91,41 @@ export default {
       }
 
       return json({ error: 'method not allowed' }, 405)
+    }
+
+    // ── /aqilah RSVP + Apple Wallet pass ──
+    if (url.pathname === '/api/aqilah/rsvp' && request.method === 'POST') {
+      let body: { name?: string }
+      try {
+        body = await request.json()
+      } catch {
+        return json({ error: 'invalid json' }, 400)
+      }
+      const name = (body.name ?? '').toString().trim().slice(0, 60)
+      if (!name) return json({ error: 'name required' }, 400)
+      const guest = { id: crypto.randomUUID(), name, createdAt: Date.now() }
+      await env.ATTIRE_KV.put(`aqilah-rsvp:${guest.id}`, JSON.stringify(guest))
+      return json(guest, 201)
+    }
+
+    const passMatch = url.pathname.match(/^\/api\/aqilah\/pass\/([0-9a-f-]{36})(?:\.pkpass)?$/)
+    if (passMatch && request.method === 'GET') {
+      const raw = await env.ATTIRE_KV.get(`aqilah-rsvp:${passMatch[1]}`)
+      if (!raw) return json({ error: 'rsvp not found' }, 404)
+      const guest = JSON.parse(raw) as { id: string; name: string }
+      try {
+        const pkpass = buildPass(env, guest)
+        return new Response(pkpass as unknown as BodyInit, {
+          headers: {
+            'content-type': 'application/vnd.apple.pkpass',
+            'content-disposition': `attachment; filename="aqilah-walimah.pkpass"`,
+            'cache-control': 'no-store',
+          },
+        })
+      } catch (err) {
+        console.error('pass build failed', err)
+        return json({ error: 'pass signing failed — are the PASS_* secrets set?' }, 500)
+      }
     }
 
     // open-slide is a client-routed SPA under /slides — unknown paths

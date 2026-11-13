@@ -18,6 +18,10 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    // /api lives in the Worker; run `bunx wrangler dev` alongside `bun run dev`
+    server: {
+      proxy: { '/api': 'http://localhost:8787' }
+    }
   }
 });
