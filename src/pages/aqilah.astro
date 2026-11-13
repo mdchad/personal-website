@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro'
 import '../styles/global.css'
 import AqilahDock from '../components/AqilahDock'
+import QRCode from 'qrcode'
 
 // ─── Invitation details ─────────────────────────────────────────────
 const invite = {
@@ -46,6 +47,12 @@ const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(invite.mapsQuery)}&n
 const title = `Walimatul Urus · ${invite.groom} & ${invite.bride}`
 const description = `${invite.groom} & ${invite.bride} — 30 May 2027 · ${invite.hashtag}`
 const ogImage = new URL('/wedding/og.jpg', Astro.site)
+const pageUrl = new URL('/aqilah', Astro.site).href
+// QR rendered at build time as inline SVG, in the card's sage on transparent
+const qrSvg = await QRCode.toString(pageUrl, {
+  type: 'svg', margin: 0, errorCorrectionLevel: 'M',
+  color: { dark: '#5f6b4eff', light: '#00000000' },
+})
 ---
 
 <Base title={title} description={description}>
@@ -248,6 +255,16 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
         <a class="btn" href={wazeUrl} target="_blank" rel="noopener">Waze</a>
       </div>
     </div>
+    <div id="sheet-share" class="sheet" role="dialog" aria-label="Share" hidden>
+      <h2>Share</h2>
+      <p class="sub en">Scan to open the invitation</p>
+      <div class="qr" role="img" aria-label={`QR code for ${pageUrl}`} set:html={qrSvg} />
+      <p class="sub small">{pageUrl.replace('https://', '')}</p>
+      <div class="buttons">
+        <button class="btn" type="button" id="share-native" hidden>Share…</button>
+        <button class="btn" type="button" id="share-copy">Copy link</button>
+      </div>
+    </div>
 
     <div class="dock"><AqilahDock client:load calendarUrl={calendarUrl} /></div>
   </main>
@@ -356,7 +373,9 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
     color: #f4efe2; font-family: var(--script); font-size: 1.45rem;
     transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1), opacity 200ms cubic-bezier(0.23, 1, 0.32, 1);
   }
-  .env-seal > span { padding-top: 0.35em; }
+  /* `.envelope > span { display: block }` outranks .env-seal, which knocked out the grid centring */
+  .envelope > .env-seal { display: grid; }
+  .env-seal > span { line-height: 1; padding-top: 0.12em; white-space: nowrap; }
   .env-seal i { font-size: 0.7em; margin: 0 1px; opacity: 0.8; }
 
   .stage.opening .env-seal { transform: scale(1.25); opacity: 0; }
@@ -493,6 +512,12 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
   .sheet .row { display: flex; gap: 0.4rem; flex-shrink: 0; }
   .sheet .buttons { margin-top: 1rem; }
   .sheet[hidden], .sheet-backdrop[hidden] { display: none; }
+  .qr {
+    width: min(56vw, 200px); aspect-ratio: 1; margin: 1rem auto 0.5rem;
+    padding: 14px; background: #fff; border-radius: 16px; border: 1px solid var(--gold);
+  }
+  .qr :global(svg) { display: block; width: 100%; height: 100%; }
+  .sheet button.btn { font-family: inherit; cursor: pointer; background: none; }
   @keyframes up { from { transform: translate(-50%, 100%); } }
   @keyframes fade { from { opacity: 0; } }
 
@@ -696,6 +721,26 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
   }
   // the React tab bar asks for sheets through these events
   window.addEventListener('dock:close', closeSheet)
+
+  // share sheet
+  const shareUrl = location.origin + location.pathname
+  const shareNative = document.getElementById('share-native')!
+  const shareCopy = document.getElementById('share-copy')!
+  if (navigator.share) {
+    shareNative.hidden = false
+    shareNative.addEventListener('click', () => {
+      navigator.share({ title: document.title, text: "You're invited to Irsyad & 'Aqilah's walimah", url: shareUrl }).catch(() => {})
+    })
+  }
+  shareCopy.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      shareCopy.textContent = 'Copied ✓'
+    } catch {
+      shareCopy.textContent = shareUrl
+    }
+    setTimeout(() => (shareCopy.textContent = 'Copy link'), 2000)
+  })
   window.addEventListener('dock:open', (e) => {
     const sheet = document.getElementById((e as CustomEvent<string>).detail)!
     if (openSheet === sheet) return

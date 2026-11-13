@@ -19,9 +19,10 @@ const TABS = [
   { value: 'contact', label: 'Contact', icon: icon(<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" />) },
   { value: 'location', label: 'Location', icon: icon(<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" /><circle cx="12" cy="10" r="3" /></>) },
   { value: 'calendar', label: 'Calendar', icon: icon(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></>) },
+  { value: 'share', label: 'Share', icon: icon(<><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" /></>) },
 ]
 
-const SHEETS: Record<string, string> = { contact: 'sheet-contact', location: 'sheet-location' }
+const SHEETS: Record<string, string> = { contact: 'sheet-contact', location: 'sheet-location', share: 'sheet-share' }
 
 export default function AqilahDock({ calendarUrl }: { calendarUrl: string }) {
   const [value, setValue] = useState('home')
