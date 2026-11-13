@@ -42,12 +42,16 @@ const calendarUrl =
   `&details=${encodeURIComponent(invite.hashtag)}`
 const mapsEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(invite.mapsQuery)}&output=embed`
 const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(invite.mapsQuery)}`
-const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(invite.mapsQuery)}&navigate=yes`
 
 const title = `Walimatul Urus · ${invite.groom} & ${invite.bride}`
 const description = `${invite.groom} & ${invite.bride} — 30 May 2027 · ${invite.hashtag}`
 const ogImage = new URL('/wedding/og.jpg', Astro.site)
 const pageUrl = new URL('/aqilah', Astro.site).href
+
+// "Father & Mother" → father (keeping the &) on one line, mother below
+const hostLines = (s: string) => s.split(' & ')
+// "Given Bin/Binte Father" → given name, then the bin/binte line below
+const coupleLines = (s: string) => s.split(/ (?=Bin(?:te)? )/)
 // QR rendered at build time as inline SVG, in the card's sage on transparent
 const qrSvg = await QRCode.toString(pageUrl, {
   type: 'svg', margin: 0, errorCorrectionLevel: 'M',
@@ -114,9 +118,9 @@ const qrSvg = await QRCode.toString(pageUrl, {
         <p class="bismillah" role="img" aria-label="بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ — In the name of Allah, the Most Gracious, the Most Merciful">&#xE802;</p>
         <p class="lead">Assalamualaikum Warahmatullahi Wabarakatuh</p>
         <p class="sub en">May Peace Be Upon You</p>
-        <p class="hosts">{invite.groomParents}</p>
+        <p class="hosts"><span class="line">{hostLines(invite.groomParents)[0]} &amp;</span><span class="line">{hostLines(invite.groomParents)[1]}</span></p>
         <p class="sub">serta | <em>with</em></p>
-        <p class="hosts">{invite.brideParents}</p>
+        <p class="hosts"><span class="line">{hostLines(invite.brideParents)[0]} &amp;</span><span class="line">{hostLines(invite.brideParents)[1]}</span></p>
         <p class="sub">Dengan segala hormatnya, kami mengundang</p>
         <p class="sub en">With much gratitude, we cordially invite</p>
         <p class="sub guest">Mr / Mrs / Ms</p>
@@ -125,9 +129,9 @@ const qrSvg = await QRCode.toString(pageUrl, {
       </section>
 
       <section class="block reveal">
-        <p class="couple">{invite.groomFull}</p>
+        <p class="couple"><span class="line">{coupleLines(invite.groomFull)[0]}</span><span class="line patronym">{coupleLines(invite.groomFull)[1]}</span></p>
         <p class="amp">&amp;</p>
-        <p class="couple">{invite.brideFull}</p>
+        <p class="couple"><span class="line">{coupleLines(invite.brideFull)[0]}</span><span class="line patronym">{coupleLines(invite.brideFull)[1]}</span></p>
       </section>
 
       <div class="divider reveal" aria-hidden="true"><span></span>❦<span></span></div>
@@ -158,7 +162,6 @@ const qrSvg = await QRCode.toString(pageUrl, {
         </div>
         <div class="reveal buttons">
           <a class="btn" href={mapsUrl} target="_blank" rel="noopener">Google Maps</a>
-          <a class="btn" href={wazeUrl} target="_blank" rel="noopener">Waze</a>
           <a class="btn" href={calendarUrl} target="_blank" rel="noopener">Save the Date</a>
         </div>
       </section>
@@ -252,7 +255,6 @@ const qrSvg = await QRCode.toString(pageUrl, {
       <p class="sub pre">{invite.venueAddress}</p>
       <div class="buttons">
         <a class="btn" href={mapsUrl} target="_blank" rel="noopener">Google Maps</a>
-        <a class="btn" href={wazeUrl} target="_blank" rel="noopener">Waze</a>
       </div>
     </div>
     <div id="sheet-share" class="sheet" role="dialog" aria-label="Share" hidden>
@@ -417,6 +419,8 @@ const qrSvg = await QRCode.toString(pageUrl, {
   .bismillah { font-family: 'KFGQPC Symbols'; font-size: clamp(1.5rem, 8.4vw, 2.35rem); line-height: 1.6; color: var(--sage); white-space: nowrap; max-width: 100%; overflow: hidden; }
   .ayah { font-family: 'QPC V1 P406'; font-size: clamp(1.2rem, 5.6vw, 1.5rem); line-height: 2.1; direction: rtl; margin-bottom: 0.75rem; word-spacing: 0.05em; }
   .couple { font-family: var(--script); font-size: clamp(1.9rem, 8vw, 2.4rem); line-height: 1.3; }
+  .hosts .line, .couple .line { display: block; }
+  .couple .patronym { font-size: 0.72em; }
   .amp { font-family: var(--script); font-size: 2rem; color: var(--rose); }
   .script { font-family: var(--script); font-size: 2.2rem; margin-top: 1.5rem; }
   .hashtag { letter-spacing: 0.18em; font-size: 0.85rem; margin-top: 0.5rem; color: var(--sage-soft); }
