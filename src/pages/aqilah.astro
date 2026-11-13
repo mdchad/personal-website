@@ -572,8 +572,12 @@ const qrSvg = await QRCode.toString(pageUrl, {
     /* LiquiKit's font shorthand needs a real family here */
     --font-sans: 'Cormorant Garamond', Georgia, serif;
   }
-  .dock .glass-ui-tabbar__row .glass-segmented__option { padding: 0 12px; }
-  .dock .glass-ui-tabbar__label { font-size: 12px; font-weight: 500; letter-spacing: 0.02em; }
+  /* LiquiKit draws the bar inside a box with a 24px bleed; its default shadow
+     (8px drop + 24px blur) reaches 32px down, so Safari cut it off in a straight
+     line. Keep the shadow inside the bleed (6 + 16 = 22px). Inline style → !important. */
+  .dock :global(.glass-pane > .glass > .glass__rim) {
+    box-shadow: 0 6px 16px rgb(40 35 20 / 0.12), 0 1px 3px rgb(40 35 20 / 0.08) !important;
+  }
   .sheet-backdrop { position: fixed; inset: 0; z-index: 25; background: rgb(40 35 25 / 0.35); animation: fade 250ms ease; }
   .sheet {
     position: fixed; left: 50%; bottom: 0; z-index: 30;
