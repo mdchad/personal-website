@@ -287,7 +287,7 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
     gap: 1.25rem; padding: 1.5rem;
     background:
       radial-gradient(ellipse at 50% 40%, #fffdf8 0%, var(--paper-deep) 70%);
-    transition: opacity 700ms ease, visibility 0s linear 700ms;
+    transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 600ms;
   }
   .stage.gone { opacity: 0; visibility: hidden; }
   .stage-kicker { letter-spacing: 0.35em; text-transform: uppercase; font-size: 0.8rem; color: var(--sage-soft); }
@@ -295,8 +295,10 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
   .stage-names span { font-size: 0.7em; color: var(--rose); }
   .stage-hint { font-style: italic; color: var(--sage-soft); animation: hint 2.4s ease-in-out infinite; }
   .stage.opening .stage-hint, .stage.opening .stage-kicker, .stage.opening .stage-names {
-    opacity: 0; transition: opacity 400ms ease;
+    opacity: 0; transition: opacity 250ms cubic-bezier(0.22, 1, 0.36, 1);
   }
+  /* the pulse animation would otherwise override the fade */
+  .stage.opening .stage-hint { animation: none; }
   @keyframes hint { 50% { opacity: 0.45; } }
 
   .envelope {
@@ -307,7 +309,12 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
     perspective: 1200px; cursor: pointer;
     border: 0; padding: 0; background: none;
     animation: float 4s ease-in-out infinite;
-    filter: drop-shadow(0 18px 28px rgb(70 60 40 / 0.18));
+  }
+  /* static contact shadow — a filter here would repaint the rotating flap every frame */
+  .envelope::before {
+    content: ''; position: absolute; z-index: -1;
+    left: 6%; right: 6%; bottom: -18px; height: 36px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(70 60 40 / 0.22), transparent);
   }
   .envelope:focus-visible { outline: 2px solid var(--sage); outline-offset: 8px; border-radius: 4px; }
   @keyframes float { 50% { transform: translateY(-6px); } }
@@ -319,7 +326,7 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
     left: 6%; right: 6%; top: 5%; height: 90%;
     border-radius: 2px; overflow: hidden; background: var(--paper);
     box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);
-    transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1) 450ms;
+    transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1) 400ms;
     z-index: 1;
   }
   .env-letter img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
@@ -347,14 +354,15 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
     box-shadow: inset 0 0 0 4px rgb(255 255 255 / 0.12), 0 3px 8px rgb(0 0 0 / 0.25);
     display: grid; place-items: center;
     color: #f4efe2; font-family: var(--script); font-size: 1.45rem;
-    transition: transform 400ms cubic-bezier(0.5, 0, 0.75, 0), opacity 300ms ease;
+    transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1), opacity 200ms cubic-bezier(0.23, 1, 0.32, 1);
   }
   .env-seal > span { padding-top: 0.35em; }
   .env-seal i { font-size: 0.7em; margin: 0 1px; opacity: 0.8; }
 
-  .stage.opening .env-seal { transform: scale(1.4); opacity: 0; }
+  .stage.opening .env-seal { transform: scale(1.25); opacity: 0; }
   .stage.opening .env-flap { transform: rotateX(180deg); z-index: 0; }
   .stage.opening .env-letter { transform: translateY(-70%); }
+
 
   /* ── Card ──────────────────────────────────────────── */
   .card {
@@ -363,10 +371,7 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
     background: var(--paper);
     box-shadow: 0 0 60px rgb(70 60 40 / 0.12);
     padding-bottom: 6rem; overflow: hidden;
-    opacity: 0; transform: translateY(40px) scale(0.97);
-    transition: opacity 900ms ease, transform 1100ms cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .card.show { opacity: 1; transform: none; }
   .hero img { display: block; width: 100%; height: auto; }
 
   .frame {
@@ -446,7 +451,7 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
   .time { font-size: 0.85rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rose); font-weight: 600; }
 
   /* scroll reveal */
-  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 800ms ease, transform 900ms cubic-bezier(0.22, 1, 0.36, 1); }
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1), transform 700ms cubic-bezier(0.22, 1, 0.36, 1); }
   .reveal.in { opacity: 1; transform: none; }
 
   /* petals */
@@ -493,7 +498,7 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
 
   @media (prefers-reduced-motion: reduce) {
     .envelope, .stage-hint { animation: none; }
-    .env-flap, .env-letter, .env-seal, .card, .reveal { transition-duration: 1ms !important; transition-delay: 0ms !important; }
+    .env-flap, .env-letter, .env-seal, .reveal { transition-duration: 1ms !important; transition-delay: 0ms !important; }
     .petals { display: none; }
   }
 </style>
@@ -506,18 +511,87 @@ const ogImage = new URL('/wedding/og.jpg', Astro.site)
 
   document.body.classList.add('locked')
 
-  envelope.addEventListener('click', () => {
+  const letter = envelope.querySelector<HTMLElement>('.env-letter')!
+  const heroImg = document.querySelector<HTMLImageElement>('.hero img')!
+
+  // Shared-element transition: the letter sticking out of the envelope grows
+  // into the full-size hero card. A fixed "flyer" holds the hero image at its
+  // final size; it starts transformed + clipped to exactly what the letter
+  // showed (its top strip, cut by the envelope's V pocket) and animates to
+  // identity, so letter → card is one continuous object.
+  function morphLetter(flyer: HTMLElement) {
+    const L = letter.getBoundingClientRect()
+    const E = envelope.getBoundingClientRect()
+    const H = heroImg.getBoundingClientRect()
+    const s = L.width / H.width
+    const W = H.width, Hh = H.height
+
+    // visible part of the letter, in the flyer's own (unscaled) coordinates
+    const toLocalY = (y: number) => Math.max(0, Math.min(Hh, (y - L.top) / s))
+    const toLocalX = (x: number) => (x - L.left) / s
+    const vY = (x: number) => E.top + (Math.abs(x - (E.left + E.width / 2)) <= E.width / 2
+      ? (1 - Math.abs(x - (E.left + E.width / 2)) / (E.width / 2)) * 0.52 * E.height : 0)
+    const bottom = toLocalY(L.bottom)
+    const edgeY = Math.min(bottom, toLocalY(vY(L.left)))
+    const midY = Math.min(bottom, toLocalY(E.top + 0.52 * E.height))
+    // where the V meets the letter's bottom edge (or the V's tip if it is higher)
+    const half = midY < bottom ? 0 : (1 - (L.bottom - E.top) / (0.52 * E.height)) * (E.width / 2)
+    const xl = toLocalX(E.left + E.width / 2 - Math.max(0, half))
+    const xr = toLocalX(E.left + E.width / 2 + Math.max(0, half))
+    const from = `polygon(0px 0px, ${W}px 0px, ${W}px ${edgeY}px, ${xr}px ${midY}px, ${xl}px ${midY}px, 0px ${edgeY}px)`
+    const to = `polygon(0px 0px, ${W}px 0px, ${W}px ${Hh}px, ${W}px ${Hh}px, 0px ${Hh}px, 0px ${Hh}px)`
+
+    // inline styles: this element is created by script, so the page's scoped CSS can't reach it
+    flyer.style.cssText = `position:fixed;z-index:60;overflow:hidden;pointer-events:none;transform-origin:0 0;will-change:transform,clip-path;left:${H.left}px;top:${H.top}px;width:${W}px;height:${Hh}px`
+    letter.style.visibility = 'hidden'
+    heroImg.style.visibility = 'hidden'
+
+    const ease = 'cubic-bezier(0.32, 0.72, 0, 1)'
+    const anim = flyer.animate(
+      [
+        { transform: `translate(${L.left - H.left}px, ${L.top - H.top}px) scale(${s})`, clipPath: from },
+        { transform: 'none', clipPath: to },
+      ],
+      { duration: 800, easing: ease, fill: 'both' },
+    )
+    return anim.finished.then(() => {
+      heroImg.style.visibility = ''
+      flyer.remove()
+    })
+  }
+
+  envelope.addEventListener('click', async () => {
     if (stage.classList.contains('opening')) return
     stage.classList.add('opening')
     window.scrollTo(0, 0)
-    setTimeout(() => {
+
+    // build the flyer now so its image is decoded before the handoff
+    const flyer = document.createElement('div')
+    flyer.className = 'flyer'
+    flyer.setAttribute('aria-hidden', 'true')
+    const img = new Image()
+    img.src = heroImg.currentSrc || heroImg.src
+    img.alt = ''
+    img.style.cssText = 'display:block;width:100%;height:100%'
+    flyer.append(img)
+    const decoded = img.decode().catch(() => {})
+
+    await new Promise((r) => setTimeout(r, reduced ? 50 : 1150)) // letter has risen
+    await decoded
+
+    const reveal = () => {
       stage.classList.add('gone')
       stage.setAttribute('aria-hidden', 'true')
-      document.body.classList.remove('locked')
       card.removeAttribute('inert')
-      card.classList.add('show')
-      startPetals()
-    }, reduced ? 50 : 1600)
+      document.body.classList.remove('locked')
+    }
+    if (reduced) { reveal(); startPetals(); return }
+
+    document.body.append(flyer)
+    const landed = morphLetter(flyer)
+    reveal() // envelope + backdrop dissolve while the letter grows
+    await landed
+    startPetals()
   })
 
   // scroll reveal
