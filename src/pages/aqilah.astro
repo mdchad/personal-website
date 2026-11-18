@@ -45,8 +45,16 @@ const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComp
 
 const title = `Walimatul Urus · ${invite.groom} & ${invite.bride}`
 const description = `${invite.groom} & ${invite.bride} — 30 May 2027 · ${invite.hashtag}`
-const ogImage = new URL('/wedding/og.jpg', Astro.site)
+const ogImage = new URL('/wedding/aqilah/og.jpg', Astro.site)
 const pageUrl = new URL('/aqilah', Astro.site).href
+
+// Flower layers, positioned in % of the 1200×1680 card. Origin is the corner each one grows from.
+const blooms = [
+  { name: 'peony', left: -19.5, top: -12.976, width: 73.508, origin: '30% 25%', sway: '7s' },
+  { name: 'roses', left: 44.0, top: 56.071, width: 63.283, origin: '70% 75%', sway: '8s' },
+  { name: 'sprig', left: 78.167, top: 8.214, width: 32.083, origin: '80% 10%', sway: '6s' },
+  { name: 'sprig-bl', left: -10.0, top: 63.69, width: 25.833, origin: '20% 90%', sway: '6.5s' },
+]
 
 // "Father & Mother" → father (keeping the &) on one line, mother below
 const hostLines = (s: string) => s.split(' & ')
@@ -77,7 +85,8 @@ const qrSvg = await QRCode.toString(pageUrl, {
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&display=swap"
       rel="stylesheet"
     />
-    <link rel="preload" as="image" href="/wedding/card.webp" />
+    <link rel="preload" as="image" href="/wedding/aqilah/card-base.webp" />
+    <link rel="preload" as="image" href="/wedding/aqilah/peony.webp" />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/kfgqpc-symbols.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/qpc-v1-p406.woff2" crossorigin />
   </Fragment>
@@ -90,7 +99,7 @@ const qrSvg = await QRCode.toString(pageUrl, {
     <button id="envelope" class="envelope" type="button" aria-label="Open the invitation">
       <span class="env-back"></span>
       <span class="env-letter">
-        <img src="/wedding/card.webp" alt="" width="1200" height="1680" />
+        <img src="/wedding/aqilah/card-base.webp" alt="" width="1500" height="2100" />
       </span>
       <span class="env-pocket"></span>
       <span class="env-flap"></span>
@@ -105,15 +114,22 @@ const qrSvg = await QRCode.toString(pageUrl, {
     <div class="petals" aria-hidden="true"></div>
 
     <section class="hero">
-      <img
-        src="/wedding/card.webp"
-        width="1200"
-        height="1680"
-        alt={`Walimatul Urus — ${invite.groom} & ${invite.bride} — 30 May 2027 — ${invite.hashtag}`}
-      />
+      <!-- the card without its three main flowers; they bloom in on top once it lands -->
+      <div class="hero-card" role="img" aria-label={`Walimatul Urus — ${invite.groom} & ${invite.bride} — 30 May 2027 — ${invite.hashtag}`}>
+        <img class="hero-base" src="/wedding/aqilah/card-base.webp" width="1500" height="2100" alt="" />
+        {blooms.map((b) => (
+          <img
+            class="bloom" src={`/wedding/aqilah/${b.name}.webp`} alt="" aria-hidden="true"
+            style={`left:${b.left}%;top:${b.top}%;width:${b.width}%;transform-origin:${b.origin};--sway:${b.sway}`}
+          />
+        ))}
+      </div>
     </section>
 
     <div class="frame">
+      <!-- the card's sprigs, echoed on page 2: top-right and bottom-left, like the card's own diagonal -->
+      <img class="frame-sprig right" src="/wedding/aqilah/sprig.webp" alt="" aria-hidden="true" loading="lazy" />
+      <img class="frame-sprig left" src="/wedding/aqilah/sprig-bl.webp" alt="" aria-hidden="true" loading="lazy" />
       <section class="block reveal">
         <p class="bismillah" role="img" aria-label="بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ — In the name of Allah, the Most Gracious, the Most Merciful">&#xE802;</p>
         <p class="lead">Assalamualaikum Warahmatullahi Wabarakatuh</p>
@@ -411,13 +427,35 @@ const qrSvg = await QRCode.toString(pageUrl, {
     box-shadow: 0 0 60px rgb(70 60 40 / 0.12);
     padding-bottom: 6rem; overflow: hidden;
   }
-  .hero img { display: block; width: 100%; height: auto; }
+  .hero-card { position: relative; overflow: hidden; }
+  .hero-base { display: block; width: 100%; height: auto; }
+  .bloom { position: absolute; height: auto; pointer-events: none; }
+  /* until the card lands the flowers are hidden (only when JS is there to bring them back) */
+  .hero-card.pre-bloom .bloom { opacity: 0; }
+  /* after blooming: a slow breeze. `rotate` is separate from the bloom's scale/translate */
+  .hero-card.bloomed .bloom { animation: sway var(--sway) ease-in-out infinite alternate; }
+  .hero-card.bloomed .bloom:nth-of-type(3) { animation-delay: -2s; }
+  .hero-card.bloomed .bloom:nth-of-type(4) { animation-delay: -4s; }
+  .hero-card.bloomed .bloom:nth-of-type(5) { animation-delay: -1s; }
+  @keyframes sway { from { rotate: -0.8deg; } to { rotate: 0.8deg; } }
 
+  /* the card's gold frame (Canva export), 9-sliced: corners stay as drawn,
+     the straight edges stretch down the whole page. 40px of the 5x source =
+     both lines; shown at 11px so the line weight matches the frame on the card. */
   .frame {
     position: relative; margin: 0 1.25rem; padding: 2.5rem 1.5rem 3rem;
-    border: 1px solid var(--gold); outline: 1px solid var(--gold); outline-offset: 5px;
+    border: 11px solid transparent;
+    border-image: url('/wedding/aqilah/frame.webp') 40 stretch;
     text-align: center;
   }
+  .frame-sprig {
+    position: absolute; z-index: 0; height: auto; pointer-events: none;
+    animation: sway 7s ease-in-out infinite alternate;
+  }
+  /* hang over the frame edge the way they do on the card (the card clips the overflow) */
+  .frame-sprig.right { width: 34%; top: 0.5rem; right: calc(-1.25rem - 10%); transform-origin: 80% 10%; }
+  .frame-sprig.left { width: 27%; bottom: 1rem; left: calc(-1.25rem - 9%); transform-origin: 20% 90%; animation-delay: -3s; }
+  .frame > .block { position: relative; z-index: 1; }
   .block { margin: 0 0 3rem; }
   .block:last-child { margin-bottom: 0; }
   h2 {
@@ -605,6 +643,7 @@ const qrSvg = await QRCode.toString(pageUrl, {
     .envelope, .stage-hint { animation: none; }
     .env-flap, .env-letter, .env-seal, .reveal { transition-duration: 1ms !important; transition-delay: 0ms !important; }
     .petals { display: none; }
+    .frame-sprig { animation: none; }
   }
 </style>
 
@@ -617,7 +656,26 @@ const qrSvg = await QRCode.toString(pageUrl, {
   document.body.classList.add('locked')
 
   const letter = envelope.querySelector<HTMLElement>('.env-letter')!
-  const heroImg = document.querySelector<HTMLImageElement>('.hero img')!
+  const heroImg = document.querySelector<HTMLImageElement>('.hero-base')!
+  const heroCard = document.querySelector<HTMLElement>('.hero-card')!
+  heroCard.classList.add('pre-bloom')
+
+  // The three flowers grow in from their corners once the card has landed:
+  // the peony leads, roses and sprig follow in an easing-out stagger.
+  function bloom() {
+    const flowers = [...heroCard.querySelectorAll<HTMLElement>('.bloom')]
+    heroCard.classList.remove('pre-bloom')
+    if (reduced) return
+    const delays = [0, 150, 260, 340] // peony leads, then the opposite corner, then the two sprigs
+    const done = flowers.map((el, i) => el.animate(
+      [
+        { opacity: 0, scale: '0.86', translate: '0 6px' },
+        { opacity: 1, scale: '1', translate: '0 0' },
+      ],
+      { duration: 1100, delay: delays[i], easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'backwards' },
+    ).finished)
+    Promise.all(done).then(() => heroCard.classList.add('bloomed'))
+  }
 
   // Shared-element transition: the letter sticking out of the envelope grows
   // into the full-size hero card. A fixed "flyer" holds the hero image at its
@@ -690,12 +748,13 @@ const qrSvg = await QRCode.toString(pageUrl, {
       card.removeAttribute('inert')
       document.body.classList.remove('locked')
     }
-    if (reduced) { reveal(); startPetals(); return }
+    if (reduced) { reveal(); bloom(); startPetals(); return }
 
     document.body.append(flyer)
     const landed = morphLetter(flyer)
     reveal() // envelope + backdrop dissolve while the letter grows
     await landed
+    bloom()
     startPetals()
   })
 
